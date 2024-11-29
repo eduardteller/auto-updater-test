@@ -1,8 +1,14 @@
-import Versions from './components/Versions'
+import { useState } from 'react'
 import electronLogo from './assets/electron.svg'
+import Versions from './components/Versions'
 
 function App(): JSX.Element {
   const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+  const [message, setMessage] = useState<string>('')
+
+  window.api.onUMessage((msg) => {
+    setMessage(msg)
+  })
 
   return (
     <>
@@ -12,9 +18,7 @@ function App(): JSX.Element {
         Build an Electron app with <span className="react">React</span>
         &nbsp;and <span className="ts">TypeScript</span>
       </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
+      <p className="tip">{message}</p>
       <div className="actions">
         <div className="action">
           <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">

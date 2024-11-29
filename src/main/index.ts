@@ -4,9 +4,11 @@ import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 import { autoUpdater } from './updater'
 
+let mainWindow: BrowserWindow | null
+
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -19,7 +21,7 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow?.show()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -43,6 +45,30 @@ app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
+  autoUpdater.checkForUpdatesAndNotify()
+
+  autoUpdater.on('checking-for-update', () => {
+    mainWindow?.webContents.send('umessage', 'Checking for update...')
+  })
+  autoUpdater.on('update-available', () => {
+    mainWindow?.webContents.send('umessage', 'Update available.')
+  })
+  autoUpdater.on('update-not-available', () => {
+    mainWindow?.webContents.send('umessage', 'Update not available.')
+  })
+  autoUpdater.on('error', (err) => {
+    mainWindow?.webContents.send('umessage', 'Error in auto-updater. ' + err)
+  })
+  autoUpdater.on('download-progress', (progressObj) => {
+    let log_message = 'Download speed: ' + progressObj.bytesPerSecond
+    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%'
+    log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')'
+    mainWindow?.webContents.send('umessage', log_message)
+  })
+  autoUpdater.on('update-downloaded', (e) => {
+    mainWindow?.webContents.send('umessage', 'Update downloaded ' + e.version)
+  })
+
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
@@ -60,8 +86,6 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
-
-  autoUpdater.checkForUpdatesAndNotify()
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

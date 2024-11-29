@@ -1,4 +1,7 @@
 provider: github
 releaseType: release
-url: https://github.com/eduardteller/auto-updater-test
-updaterCacheDirName: test-auto-updater-updater
+protocol: https
+owner: eduardteller
+private: false
+repo: auto-updater-test
+updaterCacheDirName: auto-updater-test

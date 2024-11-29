@@ -18,6 +18,7 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  oneClick: false
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -41,7 +42,8 @@ npmRebuild: false
 publish:
   provider: github
   releaseType: release
-  # url: https://example.com/auto-updates
+  protocol: https
+  owner: eduardteller
+  repo: auto-updater-test
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/
-repository: https://github.com/eduardteller/auto-updater-test
